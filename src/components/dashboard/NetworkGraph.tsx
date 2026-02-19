@@ -15,39 +15,15 @@ interface Edge {
   to: string;
 }
 
-const MOCK_NODES: Node[] = [
-  { id: "A001", x: 300, y: 200, suspicious: false, label: "A001" },
-  { id: "A002", x: 450, y: 120, suspicious: true, label: "A002" },
-  { id: "A003", x: 500, y: 280, suspicious: true, label: "A003" },
-  { id: "A004", x: 200, y: 320, suspicious: false, label: "A004" },
-  { id: "A005", x: 380, y: 380, suspicious: true, label: "A005" },
-  { id: "A006", x: 150, y: 150, suspicious: false, label: "A006" },
-  { id: "A007", x: 600, y: 180, suspicious: false, label: "A007" },
-  { id: "A008", x: 550, y: 350, suspicious: true, label: "A008" },
-  { id: "A009", x: 100, y: 250, suspicious: false, label: "A009" },
-  { id: "A010", x: 680, y: 280, suspicious: false, label: "A010" },
-  { id: "A011", x: 350, y: 80, suspicious: false, label: "A011" },
-  { id: "A012", x: 250, y: 420, suspicious: true, label: "A012" },
-];
+interface NetworkGraphProps {
+  data: {
+    nodes: Node[];
+    edges: Edge[];
+  };
+}
 
-const MOCK_EDGES: Edge[] = [
-  { from: "A001", to: "A002" },
-  { from: "A002", to: "A003" },
-  { from: "A003", to: "A005" },
-  { from: "A005", to: "A002" },
-  { from: "A001", to: "A004" },
-  { from: "A004", to: "A009" },
-  { from: "A006", to: "A001" },
-  { from: "A002", to: "A007" },
-  { from: "A007", to: "A010" },
-  { from: "A003", to: "A008" },
-  { from: "A008", to: "A005" },
-  { from: "A011", to: "A002" },
-  { from: "A004", to: "A012" },
-  { from: "A012", to: "A005" },
-];
-
-const NetworkGraph = () => {
+const NetworkGraph = ({ data }: NetworkGraphProps) => {
+  const { nodes, edges } = data;
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
   useEffect(() => {
@@ -55,6 +31,8 @@ const NetworkGraph = () => {
     if (!canvas) return;
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
+
+    if (nodes.length === 0) return;
 
     const dpr = window.devicePixelRatio || 1;
     const rect = canvas.getBoundingClientRect();
@@ -64,19 +42,30 @@ const NetworkGraph = () => {
 
     const w = rect.width;
     const h = rect.height;
-    const scaleX = w / 800;
-    const scaleY = h / 500;
+    
+    // Find bounds of node positions
+    const minX = Math.min(...nodes.map(n => n.x));
+    const maxX = Math.max(...nodes.map(n => n.x));
+    const minY = Math.min(...nodes.map(n => n.y));
+    const maxY = Math.max(...nodes.map(n => n.y));
+    
+    const rangeX = maxX - minX || 1;
+    const rangeY = maxY - minY || 1;
+    
+    const padding = 50;
+    const scaleX = (w - padding * 2) / rangeX;
+    const scaleY = (h - padding * 2) / rangeY;
 
     const getPos = (node: Node) => ({
-      x: node.x * scaleX,
-      y: node.y * scaleY,
+      x: padding + (node.x - minX) * scaleX,
+      y: padding + (node.y - minY) * scaleY,
     });
 
-    const nodeMap = new Map(MOCK_NODES.map((n) => [n.id, n]));
+    const nodeMap = new Map(nodes.map((n) => [n.id, n]));
 
     // Draw edges
     ctx.lineWidth = 1;
-    MOCK_EDGES.forEach((edge) => {
+    edges.forEach((edge) => {
       const from = nodeMap.get(edge.from);
       const to = nodeMap.get(edge.to);
       if (!from || !to) return;
@@ -94,7 +83,7 @@ const NetworkGraph = () => {
     });
 
     // Draw nodes
-    MOCK_NODES.forEach((node) => {
+    nodes.forEach((node) => {
       const pos = getPos(node);
       const r = node.suspicious ? 10 : 7;
 
@@ -119,11 +108,12 @@ const NetworkGraph = () => {
 
       // Label
       ctx.fillStyle = "hsl(210, 20%, 75%)";
-      ctx.font = `${10 * Math.min(scaleX, 1)}px 'JetBrains Mono', monospace`;
+      const scale = Math.min(scaleX, scaleY, 1);
+      ctx.font = `${10 * scale}px 'JetBrains Mono', monospace`;
       ctx.textAlign = "center";
       ctx.fillText(node.label, pos.x, pos.y + r + 14);
     });
-  }, []);
+  }, [nodes, edges]);
 
   return (
     <section className="container mx-auto max-w-6xl px-6">

@@ -9,15 +9,16 @@ import {
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 
-const data = [
-  { id: "A002", score: 0.94, patterns: ["Rapid layering", "Circular flow"], ringId: "R-001" },
-  { id: "A003", score: 0.89, patterns: ["Smurfing"], ringId: "R-001" },
-  { id: "A005", score: 0.87, patterns: ["Circular flow", "High velocity"], ringId: "R-001" },
-  { id: "A008", score: 0.82, patterns: ["Funnel account"], ringId: "R-002" },
-  { id: "A012", score: 0.76, patterns: ["Rapid layering"], ringId: "R-002" },
-];
+interface SuspiciousTableProps {
+  data: Array<{
+    id: string;
+    score: number;
+    patterns: string[];
+    ringId?: string;
+  }>;
+}
 
-const SuspiciousTable = () => {
+const SuspiciousTable = ({ data }: SuspiciousTableProps) => {
   return (
     <section className="container mx-auto max-w-6xl px-6">
       <div className="rounded-lg border border-border bg-card overflow-hidden">

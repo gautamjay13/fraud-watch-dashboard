@@ -9,43 +9,15 @@ import {
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 
-const rings = [
-  {
-    ringId: "R-001",
-    pattern: "Circular Layering",
-    memberCount: 3,
-    riskScore: 0.92,
-    members: ["A002", "A003", "A005"],
-  },
-  {
-    ringId: "R-002",
-    pattern: "Funnel & Disperse",
-    memberCount: 2,
-    riskScore: 0.79,
-    members: ["A008", "A012"],
-  },
-  {
-    ringId: "R-003",
-    pattern: "Rapid Smurfing",
-    memberCount: 4,
-    riskScore: 0.85,
-    members: ["A014", "A015", "A016", "A017"],
-  },
-  {
-    ringId: "R-004",
-    pattern: "Chain Transfer",
-    memberCount: 3,
-    riskScore: 0.71,
-    members: ["A020", "A021", "A022"],
-  },
-  {
-    ringId: "R-005",
-    pattern: "Star Topology",
-    memberCount: 5,
-    riskScore: 0.88,
-    members: ["A030", "A031", "A032", "A033", "A034"],
-  },
-];
+interface FraudRingsTableProps {
+  data: Array<{
+    ringId: string;
+    pattern: string;
+    memberCount: number;
+    riskScore: number;
+    members: string[];
+  }>;
+}
 
 const riskColor = (score: number) => {
   if (score >= 0.85) return "text-alert";
@@ -53,7 +25,7 @@ const riskColor = (score: number) => {
   return "text-muted-foreground";
 };
 
-const FraudRingsTable = () => {
+const FraudRingsTable = ({ data: rings }: FraudRingsTableProps) => {
   return (
     <section className="container mx-auto max-w-6xl px-6">
       <div className="rounded-lg border border-border bg-card overflow-hidden">

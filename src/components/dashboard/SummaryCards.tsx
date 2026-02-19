@@ -36,12 +36,21 @@ const StatCard = ({ icon: Icon, label, value, variant }: StatCardProps) => (
   </div>
 );
 
-const SummaryCards = () => {
+interface SummaryCardsProps {
+  data: {
+    totalAccounts: number;
+    suspiciousAccounts: number;
+    fraudRings: number;
+    processingTime: number;
+  };
+}
+
+const SummaryCards = ({ data }: SummaryCardsProps) => {
   const stats: StatCardProps[] = [
-    { icon: Users, label: "Total Accounts Analyzed", value: "1,247", variant: "blue" },
-    { icon: AlertTriangle, label: "Suspicious Accounts Flagged", value: "38", variant: "red" },
-    { icon: GitBranch, label: "Fraud Rings Detected", value: "5", variant: "warning" },
-    { icon: Clock, label: "Processing Time (sec)", value: "2.34", variant: "green" },
+    { icon: Users, label: "Total Accounts Analyzed", value: data.totalAccounts.toLocaleString(), variant: "blue" },
+    { icon: AlertTriangle, label: "Suspicious Accounts Flagged", value: data.suspiciousAccounts.toString(), variant: "red" },
+    { icon: GitBranch, label: "Fraud Rings Detected", value: data.fraudRings.toString(), variant: "warning" },
+    { icon: Clock, label: "Processing Time (sec)", value: data.processingTime.toFixed(2), variant: "green" },
   ];
 
   return (

@@ -8,20 +8,30 @@ import SuspiciousTable from "@/components/dashboard/SuspiciousTable";
 import FraudRingsTable from "@/components/dashboard/FraudRingsTable";
 import DownloadButton from "@/components/dashboard/DownloadButton";
 import Footer from "@/components/dashboard/Footer";
+import { analyzeCSV, type AnalysisResult } from "@/lib/api";
+import { toast } from "sonner";
 
 type Status = "idle" | "processing" | "success" | "error";
 
 const Index = () => {
   const [status, setStatus] = useState<Status>("idle");
-  const [showResults, setShowResults] = useState(true);
+  const [showResults, setShowResults] = useState(false);
+  const [analysisResult, setAnalysisResult] = useState<AnalysisResult | null>(null);
 
-  const handleUpload = (_file: File) => {
+  const handleUpload = async (file: File) => {
     setStatus("processing");
     setShowResults(false);
-    setTimeout(() => {
+    
+    try {
+      const result = await analyzeCSV(file);
+      setAnalysisResult(result);
       setStatus("success");
       setShowResults(true);
-    }, 2500);
+      toast.success("Analysis completed successfully");
+    } catch (error) {
+      setStatus("error");
+      toast.error(error instanceof Error ? error.message : "Failed to analyze CSV");
+    }
   };
 
   return (
@@ -32,13 +42,13 @@ const Index = () => {
         <CsvUpload onUpload={handleUpload} />
         <ProcessingStatus status={status} />
 
-        {showResults && (
+        {showResults && analysisResult && (
           <div className="flex flex-col gap-6 animate-fade-in">
-            <SummaryCards />
-            <NetworkGraph />
-            <SuspiciousTable />
-            <FraudRingsTable />
-            <DownloadButton />
+            <SummaryCards data={analysisResult.summary} />
+            <NetworkGraph data={analysisResult.networkGraph} />
+            <SuspiciousTable data={analysisResult.suspiciousAccounts} />
+            <FraudRingsTable data={analysisResult.fraudRings} />
+            <DownloadButton data={analysisResult} />
           </div>
         )}
       </main>

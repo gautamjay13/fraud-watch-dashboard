@@ -1,73 +1,175 @@
-# Welcome to your Lovable project
+# Fraud Watch Dashboard
 
-## Project info
+A comprehensive fraud detection dashboard with real-time transaction analysis, suspicious account detection, and fraud ring identification.
 
-**URL**: https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID
+## Project Structure
 
-## How can I edit this code?
+```
+fraud-watch-dashboard/
+├── backend/          # Node.js/Express backend API
+│   ├── src/
+│   │   ├── routes/   # API routes
+│   │   ├── services/ # Fraud detection logic
+│   │   ├── types/    # TypeScript types
+│   │   └── utils/    # Utility functions
+│   └── package.json
+└── src/              # React frontend
+    ├── components/   # React components
+    ├── lib/          # API client
+    └── pages/        # Page components
+```
 
-There are several ways of editing your application.
+## Features
 
-**Use Lovable**
+- **CSV Upload**: Upload transaction data in CSV format
+- **Real-time Analysis**: Analyze transactions for fraud patterns
+- **Suspicious Account Detection**: Identify accounts with suspicious behavior patterns
+- **Fraud Ring Detection**: Detect coordinated fraud rings
+- **Network Visualization**: Visualize transaction networks
+- **Report Download**: Export analysis results as JSON
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID) and start prompting.
+## Getting Started
 
-Changes made via Lovable will be committed automatically to this repo.
+### Prerequisites
 
-**Use your preferred IDE**
+- Node.js 18+ and npm
+- Git
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+### Backend Setup
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+1. Navigate to the backend directory:
+```bash
+cd backend
+```
 
-Follow these steps:
+2. Install dependencies:
+```bash
+npm install
+```
 
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
+3. Create a `.env` file:
+```bash
+cp .env.example .env
+```
 
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
-
-# Step 3: Install the necessary dependencies.
-npm i
-
-# Step 4: Start the development server with auto-reloading and an instant preview.
+4. Start the development server:
+```bash
 npm run dev
 ```
 
-**Edit a file directly in GitHub**
+The backend will run on `http://localhost:3001`
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+### Frontend Setup
 
-**Use GitHub Codespaces**
+1. Install dependencies (from project root):
+```bash
+npm install
+```
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+2. Create a `.env` file (optional, defaults to `http://localhost:3001`):
+```bash
+VITE_API_URL=http://localhost:3001
+```
 
-## What technologies are used for this project?
+3. Start the development server:
+```bash
+npm run dev
+```
 
-This project is built with:
+The frontend will run on `http://localhost:8080`
 
-- Vite
+## CSV Format
+
+The CSV file should contain the following columns:
+
+- `transaction_id`: Unique transaction identifier
+- `sender_id`: Account ID of the sender
+- `receiver_id`: Account ID of the receiver
+- `amount`: Transaction amount (numeric)
+- `timestamp`: Transaction timestamp (ISO format or any parseable date format)
+
+Example:
+```csv
+transaction_id,sender_id,receiver_id,amount,timestamp
+T001,A001,A002,1000.00,2024-01-01T10:00:00Z
+T002,A002,A003,500.00,2024-01-01T10:05:00Z
+```
+
+## API Endpoints
+
+### POST `/api/upload/analyze`
+Upload and analyze a CSV file.
+
+**Request:**
+- Content-Type: `multipart/form-data`
+- Body: `file` (CSV file)
+
+**Response:**
+```json
+{
+  "summary": {
+    "totalAccounts": 1247,
+    "suspiciousAccounts": 38,
+    "fraudRings": 5,
+    "processingTime": 2.34
+  },
+  "suspiciousAccounts": [...],
+  "fraudRings": [...],
+  "networkGraph": {
+    "nodes": [...],
+    "edges": [...]
+  }
+}
+```
+
+### GET `/health`
+Health check endpoint.
+
+## Fraud Detection Patterns
+
+The system detects the following suspicious patterns:
+
+1. **Rapid Layering**: Many transactions in a short time period
+2. **Circular Flow**: Accounts sending money back and forth
+3. **Smurfing**: Many small transactions to avoid detection
+4. **Funnel Account**: High incoming or outgoing with low opposite flow
+5. **High Velocity**: Many unique connections
+6. **Chain Transfer**: Linear transaction chains
+
+## Technologies
+
+### Frontend
+- React 18
 - TypeScript
-- React
-- shadcn-ui
+- Vite
 - Tailwind CSS
+- shadcn/ui
+- React Query
 
-## How can I deploy this project?
+### Backend
+- Node.js
+- Express
+- TypeScript
+- CSV Parser
+- Multer (file upload)
 
-Simply open [Lovable](https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID) and click on Share -> Publish.
+## Development
 
-## Can I connect a custom domain to my Lovable project?
+### Backend Development
+```bash
+cd backend
+npm run dev      # Start with hot reload
+npm run build    # Build for production
+npm start        # Run production build
+```
 
-Yes, you can!
+### Frontend Development
+```bash
+npm run dev      # Start development server
+npm run build    # Build for production
+npm run preview  # Preview production build
+```
 
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
+## License
 
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/features/custom-domain#custom-domain)
+MIT
